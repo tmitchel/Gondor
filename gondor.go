@@ -122,6 +122,7 @@ func main() {
 	entries := make(chan []*Entry, 1)
 	go ParseLogs(username, client, entries)
 
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(static.Serve("/", static.LocalFile("./public", false)))
 	r.Use(cors.Default()) // Maybe change from Default later
