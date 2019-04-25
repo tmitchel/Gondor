@@ -66,7 +66,7 @@ func ParseLogs(user string, client *ssh.Client, channel chan []*Entry) {
 
 		var b bytes.Buffer
 		session.Stdout = &b
-		if err := session.Run("condor_q -submitter " + user); err != nil {
+		if err := session.Run("condor_q -run -submitter " + user); err != nil {
 			log.Fatal("Failed to run: " + err.Error())
 		}
 
