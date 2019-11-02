@@ -12,8 +12,11 @@
             {{range .Messages}}
                 <div class="card">
                     <div class="card-content">
-                        <p class="title">{{.Username}}</p>
-                        <p class="subtitle">{{.DAG}}</p>
+                        <p class="title">{{.DAG}}</p>
+                        <p class="subtitle">{{.Done}}</p>
+                        <p class="subtitle">{{.Running}}</p>
+                        <p class="subtitle">{{.Total}}</p>
+                        <progress class="progress is-link" value="80" max="100">30%</progress>
                     </div>
                 </div>
             {{end}}
