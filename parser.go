@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -23,8 +24,10 @@ type Entry struct {
 
 func NewEntry(fields []string) (*Entry, error) {
 	if len(fields) < 9 {
+		logrus.Warningf("Not enough fields in %+v\n", fields)
 		return nil, fmt.Errorf("Entry must have at least 9 fields. Got %v", len(fields))
 	}
+
 	Done, _ := strconv.Atoi(fields[4])
 	Running, _ := strconv.Atoi(fields[5])
 	Idle, _ := strconv.Atoi(fields[6])
@@ -51,7 +54,6 @@ func ParseLogs(user string, client *ssh.Client, channel chan []*Entry) {
 		if err != nil {
 			log.Fatal("Failed to create session: ", err)
 		}
-		defer session.Close()
 
 		var b bytes.Buffer
 		session.Stdout = &b
@@ -73,6 +75,7 @@ func ParseLogs(user string, client *ssh.Client, channel chan []*Entry) {
 			<-channel
 		}
 		channel <- entries
+		session.Close()
 		time.Sleep(5 * time.Minute)
 	}
 }

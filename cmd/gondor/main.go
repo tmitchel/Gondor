@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/sirupsen/logrus"
 	"github.com/tmitchel/gondor"
 )
 
@@ -20,5 +21,7 @@ func main() {
 	go gondor.ParseLogs("tmitchel", conn.Client, entries)
 
 	server := gondor.NewServer(entries)
-	http.ListenAndServe(":8000", server.Router)
+	if err := http.ListenAndServe(":8000", server.Router); err != nil {
+		logrus.Fatalf("Error serving: %v", err)
+	}
 }
