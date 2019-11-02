@@ -1,7 +1,7 @@
 package gondor
 
 import (
-	"encoding/json"
+	"html/template"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -10,30 +10,33 @@ import (
 
 type Server struct {
 	*mux.Router
+	messages []*Entry
 }
 
 func NewServer(entries chan []*Entry) *Server {
 	router := mux.NewRouter()
-	router.HandleFunc("/api", HandleAPI(entries)).Methods("GET")
+	t := template.Must(template.ParseFiles("templates/dashboard.html"))
+	router.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
+		var msg []*Entry
 
-	return &Server{
-		Router: router,
-	}
-}
-
-func HandleAPI(entries chan []*Entry) http.HandlerFunc {
-	var msg []*Entry
-	return func(w http.ResponseWriter, r *http.Request) {
 		select {
 		case msg = <-entries:
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			if err := json.NewEncoder(w).Encode(msg); err != nil {
-				http.Error(w, "Unable to encode JSON", http.StatusInternalServerError)
-				logrus.Errorf("Unable to encode JSON %v due to %v", msg, err)
+			var message []Entry
+			for _, m := range msg {
+				message = append(message, *m)
+			}
+			data := struct {
+				Messages []Entry
+			}{Messages: message}
+			if err := t.Execute(w, data); err != nil {
+				logrus.Error(err)
 			}
 		default:
 			logrus.Info("No messages recieved")
 		}
+	}).Methods("GET")
+
+	return &Server{
+		Router: router,
 	}
 }
