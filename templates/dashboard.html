@@ -1,6 +1,23 @@
-<ul>
-    {{range .Messages}}
-        <li>{{.DAG}}</li>
-    {{end}}
-    <pre>{{.Messages}}</pre>
-</ul>
+{{define "dashboard"}}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Gondor</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    </head>
+    <body>
+        <div class="container">
+            {{template "header" .}}
+
+            {{range .Messages}}
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">{{.Username}}</p>
+                        <p class="subtitle">{{.DAG}}</p>
+                    </div>
+                </div>
+            {{end}}
+            <pre>{{.Messages}}</pre>
+        </div>
+    </body>
+{{end}}

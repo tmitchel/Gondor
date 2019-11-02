@@ -15,7 +15,7 @@ type Server struct {
 
 func NewServer(entries chan []*Entry) *Server {
 	router := mux.NewRouter()
-	t := template.Must(template.ParseFiles("templates/dashboard.html"))
+	t := template.Must(template.ParseFiles("templates/header.html", "templates/dashboard.html"))
 	router.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
 		var msg []*Entry
 
@@ -28,7 +28,9 @@ func NewServer(entries chan []*Entry) *Server {
 			data := struct {
 				Messages []Entry
 			}{Messages: message}
-			if err := t.Execute(w, data); err != nil {
+
+			w.Header().Set("Content-Type", "text/html")
+			if err := t.ExecuteTemplate(w, "dashboard", data); err != nil {
 				logrus.Error(err)
 			}
 		default:
